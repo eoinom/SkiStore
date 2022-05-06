@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 
 namespace API
 {
-  public class Startup
+    public class Startup
     {
         public Startup(IConfiguration configuration)
         {
@@ -21,9 +21,6 @@ namespace API
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
-            });
-            services.AddDbContext<StoreContext>(opt => {
-                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
         }
 
