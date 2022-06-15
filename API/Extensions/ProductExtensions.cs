@@ -8,7 +8,7 @@ public static class ProductExtensions
     {
         query = orderBy switch
         {
-            "price" => query.OrderBy(p => p.Price),
+            "priceAsc" => query.OrderBy(p => p.Price),
             "priceDesc" => query.OrderByDescending(p => p.Price),
             _ => query.OrderBy(p => p.Name)
         };
