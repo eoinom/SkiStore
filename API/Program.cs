@@ -1,5 +1,7 @@
 using API.Data;
+using API.Entities;
 using API.Middleware;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,14 @@ builder.Services.AddDbContext<StoreContext>(
     }
 );
 builder.Services.AddCors();
+
+// Identity
+builder.Services
+    .AddIdentityCore<User>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<StoreContext>();
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -54,15 +64,16 @@ app.MapControllers();
 // Initialise Database
 using var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
+var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 try
 {
-    context.Database.Migrate();
-    DbInitialiser.Initialise(context);
+    await context.Database.MigrateAsync();
+    await DbInitialiser.Initialise(context, userManager);
 }
 catch (Exception ex)
 {
     logger.LogError(ex, "Problem migrating data");
 }
 
-app.Run();
+await app.RunAsync();
