@@ -1,6 +1,7 @@
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Entities.OrderAggregates;
 using API.Extensions;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -93,6 +94,16 @@ public class AccountController : BaseApiController
             Token = await _tokenService.GenerateToken(user),
             Basket = userBasket?.MapBasketToDto()
         };
+    }
+
+    [Authorize]
+    [HttpGet("savedAddress")]
+    public async Task<ActionResult<UserAddress>> GetSavedAddress()
+    {
+        return await _userManager.Users
+            .Where(x => x.UserName == User.Identity.Name)
+            .Select(user => user.Address)
+            .FirstOrDefaultAsync();
     }
 
     private async Task<Basket> RetrieveBasket(string buyerId)
