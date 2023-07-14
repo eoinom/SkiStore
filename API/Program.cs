@@ -137,10 +137,13 @@ app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(
+        c =>
+        {
+            c.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
+        }
+    );
 }
-
-// app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -159,7 +162,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.MapFallbackToController("Index", "Fallback");
 
 // Initialise Database
