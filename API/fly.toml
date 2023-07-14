@@ -10,7 +10,7 @@ primary_region = "lhr"
   image = "eoinom/skistore:latest"
 
 [env]
-  ASPNETCORE_URLS="http://+8080"
+  ASPNETCORE_URLS="http://+:8080"
   StripeSettings_PublishableKey="pk_test_51M46w1DcQBmeDzw8IuAQYLJ6GgzhUABRVa6JWj8kVcbZ2Y4ThjrM0otqEzW7QMh5LDqGUOQY5Co0O1vEJHILgRNi009enTgyKx"
 
 [http_service]
