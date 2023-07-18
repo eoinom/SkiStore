@@ -73,7 +73,7 @@ public class PaymentsController : BaseApiController
             x => x.PaymentIntentId == charge.PaymentIntentId
         );
 
-        if (charge.Status == "succeeded")
+        if (order != null && charge.Status == "succeeded")
             order.OrderStatus = OrderStatus.PaymentReceived;
 
         await _context.SaveChangesAsync();
