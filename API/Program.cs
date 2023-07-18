@@ -12,12 +12,8 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-IConfigurationRoot configuration = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.Development.json")
-    .Build();
 
-// Add services to the container.
+// Add services to the container
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
@@ -27,46 +23,29 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     c =>
     {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-        c.AddSecurityDefinition(
-            "Bearer",
-            new OpenApiSecurityScheme
+        var jwtSecurityScheme = new OpenApiSecurityScheme
+        {
+            BearerFormat = "JWT",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = JwtBearerDefaults.AuthenticationScheme,
+            Description = "Put Bearer + your token in the box below",
+            Reference = new OpenApiReference
             {
-                Description = "Jwt auth header",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
+                Id = JwtBearerDefaults.AuthenticationScheme,
+                Type = ReferenceType.SecurityScheme
             }
-        );
+        };
+
+        c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
         c.AddSecurityRequirement(
-            new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        },
-                        Scheme = "oauth2",
-                        Name = "Bearer",
-                        In = ParameterLocation.Header
-                    },
-                    new List<string>()
-                }
-            }
+            new OpenApiSecurityRequirement { { jwtSecurityScheme, Array.Empty<string>() } }
         );
     }
 );
 
-// builder.Services.AddDbContext<StoreContext>(
-//     opt =>
-//     {
-//         opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-//     }
-// );
 string connString;
 if (builder.Environment.IsDevelopment())
     connString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -121,7 +100,7 @@ builder.Services
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["JWTSettings:TokenKey"])
+                    Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:TokenKey"])
                 )
             };
         }
